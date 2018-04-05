@@ -14,17 +14,7 @@
  */
 package com.amazonaws.services.s3;
 
-import static com.amazonaws.event.SDKProgressPublisher.publishProgress;
-import static com.amazonaws.internal.ResettableInputStream.newResettableInputStream;
-import static com.amazonaws.services.s3.model.S3DataSource.Utils.cleanupDataSource;
-import static com.amazonaws.util.LengthCheckInputStream.EXCLUDE_SKIPPED_BYTES;
-import static com.amazonaws.util.LengthCheckInputStream.INCLUDE_SKIPPED_BYTES;
-import static com.amazonaws.util.Throwables.failure;
-import static com.amazonaws.util.ValidationUtils.assertNotNull;
-import static com.amazonaws.util.ValidationUtils.assertStringNotEmpty;
-
-import com.amazonaws.AmazonClientException;
-import com.amazonaws.AmazonServiceException;
+import com.amazonaws.*;
 import com.amazonaws.AmazonServiceException.ErrorType;
 import com.amazonaws.AmazonWebServiceClient;
 import com.amazonaws.AmazonWebServiceRequest;
@@ -42,11 +32,7 @@ import com.amazonaws.SdkClientException;
 import com.amazonaws.annotation.SdkInternalApi;
 import com.amazonaws.annotation.SdkTestInternalApi;
 import com.amazonaws.annotation.ThreadSafe;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.Presigner;
-import com.amazonaws.auth.Signer;
-import com.amazonaws.auth.SignerFactory;
+import com.amazonaws.auth.*;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.event.ProgressEventType;
 import com.amazonaws.event.ProgressInputStream;
@@ -313,53 +299,36 @@ import com.amazonaws.services.s3.model.transform.XmlResponsesSaxParser.CopyObjec
 import com.amazonaws.services.s3.request.S3HandlerContextKeys;
 import com.amazonaws.services.s3.waiters.AmazonS3Waiters;
 import com.amazonaws.transform.Unmarshaller;
-import com.amazonaws.util.AWSRequestMetrics;
+import com.amazonaws.util.*;
 import com.amazonaws.util.AWSRequestMetrics.Field;
-import com.amazonaws.util.AwsHostNameUtils;
-import com.amazonaws.util.Base16;
 import com.amazonaws.util.Base64;
-import com.amazonaws.util.BinaryUtils;
-import com.amazonaws.util.CredentialUtils;
-import com.amazonaws.util.DateUtils;
-import com.amazonaws.util.IOUtils;
-import com.amazonaws.util.LengthCheckInputStream;
-import com.amazonaws.util.Md5Utils;
-import com.amazonaws.util.RuntimeHttpUtils;
-import com.amazonaws.util.SdkHttpUtils;
-import com.amazonaws.util.ServiceClientHolderInputStream;
-import com.amazonaws.util.StringUtils;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.ContentType;
+
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.entity.ContentType;
+
+import static com.amazonaws.event.SDKProgressPublisher.publishProgress;
+import static com.amazonaws.internal.ResettableInputStream.newResettableInputStream;
+import static com.amazonaws.services.s3.model.S3DataSource.Utils.cleanupDataSource;
+import static com.amazonaws.util.LengthCheckInputStream.EXCLUDE_SKIPPED_BYTES;
+import static com.amazonaws.util.LengthCheckInputStream.INCLUDE_SKIPPED_BYTES;
+import static com.amazonaws.util.Throwables.failure;
+import static com.amazonaws.util.ValidationUtils.assertNotNull;
+import static com.amazonaws.util.ValidationUtils.assertStringNotEmpty;
 
 /**
  * <p>
@@ -837,7 +806,12 @@ public class AmazonS3Client extends AmazonWebServiceClient implements AmazonS3 {
         addParameterIfNotNull(request, "delimiter", listVersionsRequest.getDelimiter());
 
         if (listVersionsRequest.getMaxResults() != null && listVersionsRequest.getMaxResults() >= 0) request.addParameter("max-keys", listVersionsRequest.getMaxResults().toString());
-        request.addParameter("encoding-type", shouldSDKDecodeResponse ? Constants.URL_ENCODING : listVersionsRequest.getEncodingType());
+        if (shouldSDKDecodeResponse) {
+            request.addParameter("encoding-type", Constants.URL_ENCODING);
+        } else {
+            if (!listVersionsRequest.getEncodingType().equals("none"))
+                request.addParameter("encoding-type", listVersionsRequest.getEncodingType());
+        }
 
         return invoke(request, new Unmarshallers.VersionListUnmarshaller(shouldSDKDecodeResponse), listVersionsRequest.getBucketName(), null);
     }
@@ -873,8 +847,12 @@ public class AmazonS3Client extends AmazonWebServiceClient implements AmazonS3 {
         addParameterIfNotNull(request, "marker", listObjectsRequest.getMarker());
         addParameterIfNotNull(request, "delimiter", listObjectsRequest.getDelimiter());
         if (listObjectsRequest.getMaxKeys() != null && listObjectsRequest.getMaxKeys().intValue() >= 0) request.addParameter("max-keys", listObjectsRequest.getMaxKeys().toString());
-        request.addParameter("encoding-type", shouldSDKDecodeResponse ? Constants.URL_ENCODING : listObjectsRequest.getEncodingType());
-
+        if (shouldSDKDecodeResponse) {
+            request.addParameter("encoding-type", Constants.URL_ENCODING);
+        } else {
+            if (!listObjectsRequest.getEncodingType().equals("none"))
+                request.addParameter("encoding-type", listObjectsRequest.getEncodingType());
+        }
         populateRequesterPaysHeader(request, listObjectsRequest.isRequesterPays());
 
         return invoke(request, new Unmarshallers.ListObjectsUnmarshaller(shouldSDKDecodeResponse), listObjectsRequest.getBucketName(), null);
