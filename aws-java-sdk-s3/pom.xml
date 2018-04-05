@@ -9,6 +9,11 @@
   </parent>
   <groupId>com.amazonaws</groupId>
   <artifactId>aws-java-sdk-s3</artifactId>
+  <properties>
+    <dependency.awssdk.version>1.11.309</dependency.awssdk.version>
+    <our.awssdk.s3.version>1.11.390-lf</our.awssdk.s3.version>
+  </properties>
+  <version>${our.awssdk.s3.version}</version>
   <name>AWS Java SDK for Amazon S3</name>
   <description>The AWS Java SDK for Amazon S3 module holds the client classes that are used for communicating with Amazon Simple Storage Service</description>
   <url>https://aws.amazon.com/sdkforjava</url>
@@ -19,25 +24,26 @@
         <artifactId>aws-java-sdk-kms</artifactId>
         <groupId>com.amazonaws</groupId>
         <optional>false</optional>
-        <version>${awsjavasdk.version}</version>
+        <version>${dependency.awssdk.version}</version>
     </dependency>
     <dependency>
         <artifactId>aws-java-sdk-core</artifactId>
         <groupId>com.amazonaws</groupId>
         <optional>false</optional>
-        <version>${awsjavasdk.version}</version>
+        <version>${dependency.awssdk.version}</version>
     </dependency>
     <dependency>
         <artifactId>aws-java-sdk-test-utils</artifactId>
         <groupId>com.amazonaws</groupId>
         <optional>false</optional>
         <scope>test</scope>
-        <version>${awsjavasdk.version}</version>
+        <version>${dependency.awssdk.version}</version>
     </dependency>
     <dependency>
         <artifactId>jmespath-java</artifactId>
         <groupId>com.amazonaws</groupId>
         <optional>false</optional>
+        <version>${dependency.awssdk.version}</version>
     </dependency>
 </dependencies>
 
