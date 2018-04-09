@@ -11,9 +11,8 @@
   <artifactId>aws-java-sdk-s3</artifactId>
   <properties>
     <dependency.awssdk.version>1.11.309</dependency.awssdk.version>
-    <our.awssdk.s3.version>1.11.390-lf</our.awssdk.s3.version>
   </properties>
-  <version>${our.awssdk.s3.version}</version>
+  <version>1.11.309-lf</version>
   <name>AWS Java SDK for Amazon S3</name>
   <description>The AWS Java SDK for Amazon S3 module holds the client classes that are used for communicating with Amazon Simple Storage Service</description>
   <url>https://aws.amazon.com/sdkforjava</url>
