@@ -14,14 +14,12 @@
  */
 package com.amazonaws.services.s3.internal;
 
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.amazonaws.RequestClientOptions;
 import com.amazonaws.SDKGlobalConfiguration;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.SSEAlgorithm;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Constants used by the AWS S3 Java client.
@@ -47,6 +45,9 @@ public class Constants {
 
     /** URL encoding for s3 object keys */
     public static final String URL_ENCODING = "url";
+
+    /** Symbolic value to leave off encoding-type parameter */
+    public static final String NO_ENCODING_TYPE = "none";
 
     /** HMAC/SHA1 Algorithm per RFC 2104, used when signing S3 requests */
     public static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
