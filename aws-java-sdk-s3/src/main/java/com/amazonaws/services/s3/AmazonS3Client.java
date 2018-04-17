@@ -599,12 +599,18 @@ public class AmazonS3Client extends AmazonWebServiceClient implements AmazonS3 {
         if (shouldSDKDecodeResponse) {
             request.addParameter("encoding-type", Constants.URL_ENCODING);
         } else {
-            if (!listObjectsRequest.getEncodingType().equals("none"))
+            if (!listObjectsRequest.getEncodingType().equals(Constants.NO_ENCODING_TYPE))
                 request.addParameter("encoding-type", listObjectsRequest.getEncodingType());
         }
         populateRequesterPaysHeader(request, listObjectsRequest.isRequesterPays());
 
-        return invoke(request, new Unmarshallers.ListObjectsUnmarshaller(shouldSDKDecodeResponse), listObjectsRequest.getBucketName(), null);
+        ObjectListing objectListing = invoke(request, new Unmarshallers.ListObjectsUnmarshaller(shouldSDKDecodeResponse), listObjectsRequest.getBucketName(), null);
+
+        /* Ensure proper propagation to next list request */
+        if (!shouldSDKDecodeResponse && listObjectsRequest.getEncodingType().equals(Constants.NO_ENCODING_TYPE))
+            objectListing.setEncodingType(listObjectsRequest.getEncodingType());
+
+        return objectListing;
     }
 
     @Override
